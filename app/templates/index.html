@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sentiment Analysis</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+      <h1 class="text-3xl font-bold mb-6">Sentiment Analysis</h1>
+
+      <!-- Text Input Form -->
+      <div class="mb-6">
+        <textarea
+          id="textInput"
+          class="w-full p-2 border rounded-lg"
+          rows="4"
+          placeholder="Enter text for analysis..."
+        ></textarea>
+      </div>
+
+      <!-- Model Selection -->
+      <div class="mb-4">
+        <label class="block mb-2">Model Selection:</label>
+        <select id="modelSelect" class="w-full p-2 border rounded">
+          <option value="custom">Custom Model</option>
+          <option value="huggingface">Hugging Face Model</option>
+        </select>
+      </div>
+
+      <!-- RAG Toggle -->
+      <div class="mb-4">
+        <label class="flex items-center">
+          <input type="checkbox" id="ragToggle" class="mr-2" />
+          Enable RAG (Retrieval-Augmented Generation)
+        </label>
+      </div>
+
+      <!-- Analysis Button -->
+      <button
+        onclick="analyzeSentiment()"
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Analyze
+      </button>
+
+      <!-- Results Display -->
+      <div id="results" class="mt-6 p-4 border rounded-lg hidden">
+        <h2 class="text-xl font-bold mb-2">Results:</h2>
+        <p id="prediction" class="text-lg"></p>
+        <p id="modelUsed" class="text-sm text-gray-600 mt-2"></p>
+        <p id="contextUsed" class="text-sm text-gray-600"></p>
+      </div>
+
+      <!-- Knowledge Base Upload -->
+      <div class="mt-8 border-t pt-6">
+        <h2 class="text-xl font-bold mb-4">Upload Knowledge Base Document</h2>
+        <input type="file" id="fileInput" accept=".txt" class="mb-4" />
+        <button
+          onclick="uploadDocument()"
+          class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Upload
+        </button>
+      </div>
+    </div>
+
+    <script>
+      async function analyzeSentiment() {
+        const text = document.getElementById("textInput").value;
+        const model = document.getElementById("modelSelect").value;
+        const useRag = document.getElementById("ragToggle").checked;
+
+        try {
+          const response = await fetch("/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ text, model, use_rag: useRag }),
+          });
+
+          const data = await response.json();
+
+          document.getElementById("results").classList.remove("hidden");
+          document.getElementById(
+            "prediction"
+          ).textContent = `Sentiment: ${data.prediction}`;
+          document.getElementById(
+            "modelUsed"
+          ).textContent = `Model used: ${data.model_used}`;
+          document.getElementById(
+            "contextUsed"
+          ).textContent = `RAG context used: ${
+            data.context_used ? "Yes" : "No"
+          }`;
+        } catch (error) {
+          alert("Error analyzing sentiment: " + error);
+        }
+      }
+
+      async function uploadDocument() {
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
+
+        if (!file) {
+          alert("Please select a file");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const response = await fetch("/upload_knowledge", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+          if (data.message) {
+            alert("Document uploaded successfully");
+            fileInput.value = "";
+          } else {
+            alert("Error: " + data.error);
+          }
+        } catch (error) {
+          alert("Error uploading document: " + error);
+        }
+      }
+    </script>
+  </body>
+</html>

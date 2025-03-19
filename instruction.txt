@@ -1,0 +1,26 @@
+Just run the app.py file
+Follow the link to check the status
+Test is locally via CMD :curl -X POST -H "Content-Type: application/json" -d "{\"text\": \"I am very disappointed with the service.\"}" http://127.0.0.1:5000/predict
+This is the likely result:In VScode termonal:INFO:root:Request data: {'text': 'I am very disappointed with the service.'}
+1/1 [==============================] - 0s 115ms/step
+INFO:root:Prediction result: {'text': 'I am very disappointed with the service.', 'prediction': 0.1483493596315384, 'class': 'Negative', 'status': 'success'}
+INFO:werkzeug:127.0.0.1 - - [22/Jan/2025 18:53:13] "POST /predict HTTP/1.1" 200 -
+INFO:root:Received request at /predict endpoint
+INFO:root:Request data: {'text': 'I am very disappointed with the service.'}
+1/1 [==============================] - 0s 110ms/step
+INFO:root:Prediction result: {'text': 'I am very disappointed with the service.', 'prediction': 0.1483493596315384, 'class': 'Negative', 'status': 'success'}
+INFO:werkzeug:127.0.0.1 - - [22/Jan/2025 19:13:05] "POST /predict HTTP/1.1" 200 -
+(From Line 4-13 this is what we epected)
+ This is the cmd code:C:\Users\Ricky\Desktop\MASTERS\DATA SCIENCE for Decision Making-MILE\Sentiment Analysis>curl -X POST -H "Content-Type: application/json" -d "{\"text\": \"I am very disappointed with the service.\"}" http://127.0.0.1:5000/predict
+{
+  "class": "Negative",
+  "prediction": 0.1483493596315384,
+  "status": "success",
+  "text": "I am very disappointed with the service."
+
+
+  model.safetensors:100%|
+  config.json: 100%
+  tokenizer.json: 100%
+  vocab.txt: 100%
+  vocab.txt: 100%
